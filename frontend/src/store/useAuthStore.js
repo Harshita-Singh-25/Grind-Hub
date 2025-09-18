@@ -10,14 +10,28 @@ const useAuthStore = create((set) => ({
 
   checkAuth: async () => {
     try {
-      const res = await fetch("/api/auth/check");
+      const res = await fetch("/api/auth/check", {
+        credentials: 'include' // Important for cookies
+      });
+      
+      // Check if response is HTML (indicating backend is not reachable)
+      const contentType = res.headers.get('content-type');
+      if (contentType && contentType.includes('text/html')) {
+        console.log("Backend server may not be running - received HTML instead of JSON");
+        set({ authUser: null, isCheckingAuth: false });
+        return;
+      }
+      
+      // Try to parse as JSON
       const data = await res.json();
+      
       if (!res.ok) {
         throw new Error(data.error || "Something went wrong");
       }
+      
       set({ authUser: data });
     } catch (error) {
-      console.log("Error in checkAuth:", error);
+      console.log("Error in checkAuth:", error.message);
       set({ authUser: null });
     } finally {
       set({ isCheckingAuth: false });
@@ -32,8 +46,16 @@ const useAuthStore = create((set) => ({
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: 'include', // Add this for cookies
         body: JSON.stringify(data),
       });
+      
+      // Check for HTML response
+      const contentType = res.headers.get('content-type');
+      if (contentType && contentType.includes('text/html')) {
+        throw new Error("Backend server may not be running");
+      }
+      
       const userData = await res.json();
       if (!res.ok) {
         throw new Error(userData.error || "Something went wrong");
@@ -54,8 +76,16 @@ const useAuthStore = create((set) => ({
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: 'include', // Add this for cookies
         body: JSON.stringify(data),
       });
+      
+      // Check for HTML response
+      const contentType = res.headers.get('content-type');
+      if (contentType && contentType.includes('text/html')) {
+        throw new Error("Backend server may not be running");
+      }
+      
       const userData = await res.json();
       if (!res.ok) {
         throw new Error(userData.error || "Something went wrong");
@@ -72,19 +102,116 @@ const useAuthStore = create((set) => ({
     try {
       const res = await fetch("/api/auth/logout", {
         method: "POST",
+        credentials: 'include', // Add this for cookies
       });
-      if (!res.ok) {
-        throw new Error("Something went wrong");
-      }
+      
+      // Even if logout fails, clear frontend state
       set({ authUser: null });
+      
+      if (!res.ok) {
+        console.log("Logout failed on backend, but cleared frontend state");
+      }
     } catch (error) {
       console.log("Error in logout:", error);
-      throw error;
+      // Still clear the frontend state
+      set({ authUser: null });
     }
   },
 }));
 
 export { useAuthStore };
+
+
+
+// import { create } from "zustand";
+
+// const useAuthStore = create((set) => ({
+//   authUser: null,
+//   isSigningUp: false,
+//   isLoggingIn: false,
+//   isUpdatingProfile: false,
+//   isCheckingAuth: true,
+
+//   checkAuth: async () => {
+//     try {
+//       const res = await fetch("/api/auth/check");
+//       const data = await res.json();
+//       if (!res.ok) {
+//         throw new Error(data.error || "Something went wrong");
+//       }
+//       set({ authUser: data });
+//     } catch (error) {
+//       console.log("Error in checkAuth:", error);
+//       set({ authUser: null });
+//     } finally {
+//       set({ isCheckingAuth: false });
+//     }
+//   },
+
+//   signup: async (data) => {
+//     set({ isSigningUp: true });
+//     try {
+//       const res = await fetch("/api/auth/signup", {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify(data),
+//       });
+//       const userData = await res.json();
+//       if (!res.ok) {
+//         throw new Error(userData.error || "Something went wrong");
+//       }
+//       set({ authUser: userData });
+//     } catch (error) {
+//       throw error;
+//     } finally {
+//       set({ isSigningUp: false });
+//     }
+//   },
+
+//   login: async (data) => {
+//     set({ isLoggingIn: true });
+//     try {
+//       const res = await fetch("/api/auth/login", {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify(data),
+//       });
+//       const userData = await res.json();
+//       if (!res.ok) {
+//         throw new Error(userData.error || "Something went wrong");
+//       }
+//       set({ authUser: userData });
+//     } catch (error) {
+//       throw error;
+//     } finally {
+//       set({ isLoggingIn: false });
+//     }
+//   },
+
+//   logout: async () => {
+//     try {
+//       const res = await fetch("/api/auth/logout", {
+//         method: "POST",
+//       });
+//       if (!res.ok) {
+//         throw new Error("Something went wrong");
+//       }
+//       set({ authUser: null });
+//     } catch (error) {
+//       console.log("Error in logout:", error);
+//       throw error;
+//     }
+//   },
+// }));
+
+// export { useAuthStore };
+
+
+
 // import { create } from "zustand";
 // import { axiosInstance } from "../lib/axios.js";
 // import toast from "react-hot-toast";

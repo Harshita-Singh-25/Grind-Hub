@@ -2,9 +2,8 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 
-import Sidebar from './components/common/SideBar';
+import Sidebar from './components/common/Sidebar';
 import Navbar from './components/common/Navbar';
-//import DashboardPage from './pages/DashboardPage';
 import DashboardPage from './pages/DashBoardPage';
 import RoomsPage from './pages/RoomsPage';
 import ProblemsPage from './pages/ProblemsPage';
@@ -21,13 +20,18 @@ function App() {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
 
   useEffect(() => {
+    // Only check auth if we're not in a development environment without backend
     checkAuth();
   }, [checkAuth]);
 
-  if (isCheckingAuth && !authUser) {
+  // Show loading spinner while checking auth
+  if (isCheckingAuth) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <LoadingSpinner />
+      <div className="flex items-center justify-center h-screen bg-base-300">
+        <div className="text-center">
+          <LoadingSpinner />
+          <p className="mt-4 text-base-content/70">Checking authentication...</p>
+        </div>
       </div>
     );
   }
@@ -58,7 +62,7 @@ function App() {
           <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       )}
-      <Toaster />
+      <Toaster position="top-right" />
     </div>
   );
 }
