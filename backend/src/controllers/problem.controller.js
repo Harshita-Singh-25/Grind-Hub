@@ -112,3 +112,51 @@ export const likeProblem = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+
+export const updateProblem = async (req, res) => {
+  try {
+    const problemId = req.params.id;
+    const updates = req.body;
+    
+    const problem = await Problem.findById(problemId);
+    if (!problem) {
+      return res.status(404).json({ error: "Problem not found" });
+    }
+
+    // Only creator can update
+    if (!problem.createdBy.equals(req.user._id)) {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    const updatedProblem = await Problem.findByIdAndUpdate(problemId, updates, { new: true })
+      .populate('createdBy', 'fullName profilePic');
+
+    res.status(200).json(updatedProblem);
+  } catch (error) {
+    console.log("Error in updateProblem controller: ", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const deleteProblem = async (req, res) => {
+  try {
+    const problemId = req.params.id;
+    
+    const problem = await Problem.findById(problemId);
+    if (!problem) {
+      return res.status(404).json({ error: "Problem not found" });
+    }
+
+    // Only creator can delete
+    if (!problem.createdBy.equals(req.user._id)) {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    await Problem.findByIdAndDelete(problemId);
+    res.status(200).json({ message: "Problem deleted successfully" });
+  } catch (error) {
+    console.log("Error in deleteProblem controller: ", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};

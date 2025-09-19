@@ -124,3 +124,52 @@ export const getRoomMessages = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+
+export const updateRoom = async (req, res) => {
+  try {
+    const roomId = req.params.id;
+    const updates = req.body;
+    
+    const room = await Room.findById(roomId);
+    if (!room) {
+      return res.status(404).json({ error: "Room not found" });
+    }
+
+    // Only creator or moderators can update
+    if (!room.createdBy.equals(req.user._id) && !room.moderators.includes(req.user._id)) {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
+    const updatedRoom = await Room.findByIdAndUpdate(roomId, updates, { new: true })
+      .populate('createdBy', 'fullName profilePic')
+      .populate('members', 'fullName profilePic');
+
+    res.status(200).json(updatedRoom);
+  } catch (error) {
+    console.log("Error in updateRoom controller: ", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const deleteRoom = async (req, res) => {
+  try {
+    const roomId = req.params.id;
+    
+    const room = await Room.findById(roomId);
+    if (!room) {
+      return res.status(404).json({ error: "Room not found" });
+    }
+
+    // Only creator can delete
+    if (!room.createdBy.equals(req.user._id)) {
+      return res.status(403).json({ error: "Only room creator can delete" });
+    }
+
+    await Room.findByIdAndDelete(roomId);
+    res.status(200).json({ message: "Room deleted successfully" });
+  } catch (error) {
+    console.log("Error in deleteRoom controller: ", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
