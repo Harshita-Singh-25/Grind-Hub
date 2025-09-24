@@ -12,6 +12,9 @@ import ProfilePage from './pages/ProfilePage';
 import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
 
+import ChatPage from './pages/ChatPage'; // New import
+
+
 import { useAuthStore } from './store/useAuthStore';
 import { useEffect } from 'react';
 import LoadingSpinner from './components/common/LoadingSpinner';
@@ -47,6 +50,8 @@ function App() {
               <Routes>
                 <Route path="/" element={<DashboardPage />} />
                 <Route path="/rooms" element={<RoomsPage />} />
+                <Route path="/chat" element={<ChatPage />} /> {/* New chat route */}
+
                 <Route path="/problems" element={<ProblemsPage />} />
                 <Route path="/study" element={<StudyPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
