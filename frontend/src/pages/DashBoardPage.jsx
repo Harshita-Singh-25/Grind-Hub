@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Clock, Target, Trophy, BookOpen, TrendingUp } from 'lucide-react';
 import DailyGoals from '../components/dashboard/DailyGoals';
 import StudyStats from '../components/dashboard/StudyStats';
-import RecentActivity from '../components/dashboard/RecentActivity';
+
 import { useStudyStore } from '../store/useStudyStore';
 
 const DashboardPage = () => {
@@ -73,7 +73,7 @@ const DashboardPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           <StudyStats />
-          <RecentActivity />
+          
         </div>
         <div className="space-y-6">
           <DailyGoals />
