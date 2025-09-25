@@ -14,7 +14,9 @@ const messageSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId, 
     ref: "Room" 
   },
-  message: { type: String, required: true },
+  text: { type: String },
+  image: { type: String },
+  message: { type: String },
   messageType: {
     type: String,
     enum: ['text', 'code', 'problem-link', 'file', 'voice-note'],

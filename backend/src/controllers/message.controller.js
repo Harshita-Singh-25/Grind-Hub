@@ -41,30 +41,53 @@ export const sendMessage = async (req, res) => {
     const { id: receiverId } = req.params;
     const senderId = req.user._id;
 
+    console.log("Send message request:", { text, image: !!image, receiverId, senderId });
+
+    // Validate required fields
+    if (!text && !image) {
+      return res.status(400).json({ error: "Message text or image is required" });
+    }
+
+    if (!receiverId) {
+      return res.status(400).json({ error: "Receiver ID is required" });
+    }
+
     let imageUrl;
     if (image) {
-      // Upload base64 image to cloudinary
-      const uploadResponse = await cloudinary.uploader.upload(image);
-      imageUrl = uploadResponse.secure_url;
+      try {
+        // Upload base64 image to cloudinary
+        const uploadResponse = await cloudinary.uploader.upload(image);
+        imageUrl = uploadResponse.secure_url;
+        console.log("Image uploaded successfully:", imageUrl);
+      } catch (cloudinaryError) {
+        console.error("Cloudinary upload error:", cloudinaryError);
+        return res.status(500).json({ error: "Failed to upload image" });
+      }
     }
 
     const newMessage = new Message({
       senderId,
       receiverId,
-      text,
+      text: text || "",
       image: imageUrl,
     });
 
+    console.log("Creating message:", newMessage);
     await newMessage.save();
+    console.log("Message saved successfully");
 
     const receiverSocketId = getReceiverSocketId(receiverId);
     if (receiverSocketId) {
+      console.log("Sending socket notification to:", receiverSocketId);
       io.to(receiverSocketId).emit("newMessage", newMessage);
+    } else {
+      console.log("Receiver not online, message saved but not delivered via socket");
     }
 
     res.status(201).json(newMessage);
   } catch (error) {
-    console.log("Error in sendMessage controller: ", error.message);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Error in sendMessage controller:", error);
+    console.error("Error stack:", error.stack);
+    res.status(500).json({ error: "Internal server error", details: error.message });
   }
 };
