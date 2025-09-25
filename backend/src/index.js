@@ -33,7 +33,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/rooms", roomRoutes); // Add this
 app.use("/api/problems", problemRoutes); // Add this
-app.use("/api/study", (await import("./routes/study.js")).default);
+app.use("/api/study", (await import("./routes/study.route.js")).default);
 
 
 if (process.env.NODE_ENV === "production") {

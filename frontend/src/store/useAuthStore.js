@@ -1,4 +1,3 @@
-
 import { create } from "zustand";
 import { initSocket, disconnectSocket } from '../lib/socket';
 
@@ -13,10 +12,35 @@ const useAuthStore = create((set) => ({
   checkAuth: async () => {
     try {
       const res = await fetch("/api/auth/check", {
-        credentials: 'include' // Important for cookies
+        credentials: 'include'
       });
       
-      // Check if response is HTML (indicating backend is not reachable)
+      console.log("Auth check response status:", res.status); // Debug log
+      
+      // If not 200, handle error
+      if (!res.ok) {
+        if (res.status === 401) {
+          console.log("No valid token - user not authenticated");
+          set({ authUser: null, isCheckingAuth: false });
+          return;
+        }
+        
+        // Try to get error message from response
+        const errorText = await res.text();
+        console.log("Auth check error response:", errorText);
+        
+        // Try to parse as JSON, fallback to text
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch {
+          errorData = { error: errorText };
+        }
+        
+        throw new Error(errorData.error || `HTTP ${res.status}`);
+      }
+      
+      // Check content type
       const contentType = res.headers.get('content-type');
       if (contentType && contentType.includes('text/html')) {
         console.log("Backend server may not be running - received HTML instead of JSON");
@@ -24,26 +48,25 @@ const useAuthStore = create((set) => ({
         return;
       }
       
-      // Try to parse as JSON
       const data = await res.json();
-      
-      if (!res.ok) {
-        throw new Error(data.error || "Something went wrong");
-      }
+      console.log("Auth check successful:", data); // Debug log
       
       set({ authUser: data });
+      
       // Initialize WebSocket connection after successful auth check
       if (data?._id) {
         initSocket(data._id);
       }
     } catch (error) {
       console.log("Error in checkAuth:", error.message);
+      console.log("Full error:", error); // More detailed logging
       set({ authUser: null });
     } finally {
       set({ isCheckingAuth: false });
     }
   },
 
+  // ... rest of your auth methods remain the same
   signup: async (data) => {
     set({ isSigningUp: true });
     try {
@@ -56,7 +79,6 @@ const useAuthStore = create((set) => ({
         body: JSON.stringify(data),
       });
       
-      // Check for HTML response
       const contentType = res.headers.get('content-type');
       if (contentType && contentType.includes('text/html')) {
         throw new Error("Backend server may not be running");
@@ -68,7 +90,6 @@ const useAuthStore = create((set) => ({
       }
       
       set({ authUser: userData });
-      // Initialize WebSocket after successful signup
       if (userData?._id) {
         initSocket(userData._id);
       }
@@ -94,7 +115,6 @@ const useAuthStore = create((set) => ({
         body: JSON.stringify(data),
       });
       
-      // Check for HTML response
       const contentType = res.headers.get('content-type');
       if (contentType && contentType.includes('text/html')) {
         throw new Error("Backend server may not be running");
@@ -106,7 +126,6 @@ const useAuthStore = create((set) => ({
       }
       
       set({ authUser: userData });
-      // Initialize WebSocket after successful login
       if (userData?._id) {
         initSocket(userData._id);
       }
@@ -129,14 +148,11 @@ const useAuthStore = create((set) => ({
     } catch (error) {
       console.log("Error in logout:", error.message);
     } finally {
-      // Disconnect WebSocket on logout
       disconnectSocket();
-      // Clear the frontend state
       set({ authUser: null });
     }
   },
   
-  // Handle online users list update from WebSocket
   setOnlineUsers: (userIds) => {
     set({ onlineUsers: userIds });
   }

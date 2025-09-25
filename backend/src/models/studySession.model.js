@@ -15,4 +15,4 @@ const studySessionSchema = new mongoose.Schema({
   topics: [String]
 }, { timestamps: true });
 
-export default mongoose.model("StudySession", studySessionSchema);
+export default mongoose.model("studySession", studySessionSchema);
