@@ -2,13 +2,14 @@ import { create } from "zustand";
 import { axiosInstance } from '../lib/axios';
 import { initSocket, disconnectSocket } from '../lib/socket';
 
-const useAuthStore = create((set) => ({
+const useAuthStore = create((set, get) => ({
   authUser: null,
   isSigningUp: false,
   isLoggingIn: false,
   isUpdatingProfile: false,
   isCheckingAuth: true,
   onlineUsers: [],
+  socket: null,
 
   checkAuth: async () => {
     try {
@@ -56,7 +57,8 @@ const useAuthStore = create((set) => ({
       
       // Initialize WebSocket connection after successful auth check
       if (data?._id) {
-        initSocket(data._id);
+        const socket = initSocket(data._id);
+        set({ socket });
       }
     } catch (error) {
       console.log("Error in checkAuth:", error.message);
@@ -92,7 +94,8 @@ const useAuthStore = create((set) => ({
       
       set({ authUser: userData });
       if (userData?._id) {
-        initSocket(userData._id);
+        const socket = initSocket(userData._id);
+        set({ socket });
       }
       
       return userData;
@@ -128,7 +131,8 @@ const useAuthStore = create((set) => ({
       
       set({ authUser: userData });
       if (userData?._id) {
-        initSocket(userData._id);
+        const socket = initSocket(userData._id);
+        set({ socket });
       }
       
       return userData;
@@ -150,12 +154,16 @@ const useAuthStore = create((set) => ({
       console.log("Error in logout:", error.message);
     } finally {
       disconnectSocket();
-      set({ authUser: null });
+      set({ authUser: null, socket: null });
     }
   },
   
   setOnlineUsers: (userIds) => {
     set({ onlineUsers: userIds });
+  },
+
+  getSocket: () => {
+    return get().socket;
   }
 }));
 

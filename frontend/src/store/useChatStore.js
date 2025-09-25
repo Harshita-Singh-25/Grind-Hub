@@ -49,7 +49,14 @@ export const useChatStore = create((set, get) => ({
 
     const socket = useAuthStore.getState().socket;
     if (!socket) {
-      console.error("Socket not available");
+      console.error("Socket not available - retrying in 1 second");
+      // Retry after a short delay in case socket is still connecting
+      setTimeout(() => {
+        const retrySocket = useAuthStore.getState().socket;
+        if (retrySocket) {
+          get().subscribeToMessages();
+        }
+      }, 1000);
       return;
     }
 
@@ -68,7 +75,9 @@ export const useChatStore = create((set, get) => ({
   
   unsubscribeFromMessages: () => {
     const socket = useAuthStore.getState().socket;
-    socket.off("newMessage");
+    if (socket) {
+      socket.off("newMessage");
+    }
   },
 
   setSelectedUser: (selectedUser) => set({ selectedUser }),
