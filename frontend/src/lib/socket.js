@@ -1,7 +1,7 @@
 import { io } from 'socket.io-client';
 import { useAuthStore } from '../store/useAuthStore';
 
-const URL = 'http://localhost:5000';
+const URL = 'http://localhost:5001';
 let socket;
 
 // Initialize the socket connection with the user ID

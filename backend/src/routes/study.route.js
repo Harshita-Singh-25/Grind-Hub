@@ -14,7 +14,7 @@ const router = express.Router();
 router.post("/session/start", protectRoute, startStudySession);
 router.post("/session/end", protectRoute, endStudySession);
 router.get("/stats", protectRoute, getStudyStats);
-router.get("/goal", protectRoute, getDailyGoal);
-router.put("/goal", protectRoute, updateDailyGoal);
+//router.get("/goal", protectRoute, getDailyGoal);
+//router.put("/goal", protectRoute, updateDailyGoal);
 
 export default router;
