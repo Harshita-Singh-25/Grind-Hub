@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { axiosInstance } from '../lib/axios';
 import { initSocket, disconnectSocket } from '../lib/socket';
 
 const useAuthStore = create((set) => ({
