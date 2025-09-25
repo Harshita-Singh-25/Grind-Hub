@@ -2,7 +2,8 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 
-import Sidebar from './components/common/Sidebar';
+//import Sidebar from './components/common/Sidebar';
+import Sidebar from './components/common/SideBar';
 import Navbar from './components/common/Navbar';
 import DashboardPage from './pages/DashBoardPage';
 import RoomsPage from './pages/RoomsPage';
