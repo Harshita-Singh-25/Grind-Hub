@@ -2,12 +2,16 @@ import { useEffect, useState } from "react";
 import { useChatStore } from "../../store/useChatStore";  // This is actually correct
 import { useAuthStore } from "../../store/useAuthStore";  // This is actually correct
 import SidebarSkeleton from "../skeletons/SidebarSkeleton"; // 
-import { Users } from "lucide-react";
+import { Users, RefreshCw } from "lucide-react";
 
 const ChatSidebar = () => {
   const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading } = useChatStore();
-  const { onlineUsers } = useAuthStore();
+  const { onlineUsers, refreshOnlineUsers } = useAuthStore();
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
+
+  // Debug online users
+  console.log('ChatSidebar - onlineUsers:', onlineUsers);
+  console.log('ChatSidebar - users:', users);
 
   useEffect(() => {
     getUsers();
@@ -25,6 +29,13 @@ const ChatSidebar = () => {
         <div className="flex items-center gap-2">
           <Users className="size-6" />
           <span className="font-medium hidden lg:block">Direct Messages</span>
+          <button
+            onClick={refreshOnlineUsers}
+            className="btn btn-ghost btn-sm ml-auto"
+            title="Refresh online users"
+          >
+            <RefreshCw size={16} />
+          </button>
         </div>
         {/* Online filter toggle */}
         <div className="mt-3 hidden lg:flex items-center gap-2">

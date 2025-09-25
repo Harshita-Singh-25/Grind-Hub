@@ -33,6 +33,7 @@ export const initSocket = (userId) => {
   // Connection established
   socket.on('connect', () => {
     console.log('Connected to WebSocket server with ID:', socket.id);
+    console.log('Socket connected for user:', userId);
   });
   
   // Disconnected from server
@@ -60,7 +61,15 @@ export const initSocket = (userId) => {
   // Online users list updated
   socket.on('getOnlineUsers', (userIds) => {
     console.log('Online users updated:', userIds);
-    useAuthStore.getState().setOnlineUsers(userIds);
+    console.log('Current online users count:', userIds.length);
+    
+    // Ensure we have a valid array
+    if (Array.isArray(userIds)) {
+      useAuthStore.getState().setOnlineUsers(userIds);
+      console.log('Auth store updated with online users');
+    } else {
+      console.error('Invalid online users data received:', userIds);
+    }
   });
   
   // Handle custom events
@@ -95,6 +104,16 @@ export const getSocket = () => {
     console.warn('Socket not initialized. Call initSocket(userId) first.');
   }
   return socket;
+};
+
+// Manually request online users list
+export const requestOnlineUsers = () => {
+  if (socket && socket.connected) {
+    console.log('Requesting online users list...');
+    socket.emit('getOnlineUsers');
+  } else {
+    console.warn('Socket not connected, cannot request online users');
+  }
 };
 
 // Disconnect the socket

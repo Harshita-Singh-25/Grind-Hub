@@ -159,11 +159,23 @@ const useAuthStore = create((set, get) => ({
   },
   
   setOnlineUsers: (userIds) => {
+    console.log('Setting online users in auth store:', userIds);
     set({ onlineUsers: userIds });
+    console.log('Online users set successfully');
   },
 
   getSocket: () => {
     return get().socket;
+  },
+
+  refreshOnlineUsers: () => {
+    const socket = get().socket;
+    if (socket && socket.connected) {
+      console.log('Manually requesting online users...');
+      socket.emit('getOnlineUsers');
+    } else {
+      console.warn('Socket not connected, cannot refresh online users');
+    }
   }
 }));
 
