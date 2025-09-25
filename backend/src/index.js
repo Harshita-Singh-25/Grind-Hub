@@ -7,6 +7,7 @@ import path from "path";
 
 import { connectDB } from "./lib/db.js";
 
+
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
 import { app, server } from "./lib/socket.js";
@@ -32,6 +33,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/rooms", roomRoutes); // Add this
 app.use("/api/problems", problemRoutes); // Add this
+app.use("/api/study", (await import("./routes/study.js")).default);
 
 
 if (process.env.NODE_ENV === "production") {
