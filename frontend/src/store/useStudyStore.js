@@ -155,6 +155,80 @@ const useStudyStore = create((set, get) => ({
     }
   },
 
+  // Todo methods
+  addTodo: async (todoData) => {
+    set({ error: null });
+    try {
+      const res = await fetch("/api/study/goal/todos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: 'include',
+        body: JSON.stringify(todoData),
+      });
+      
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || `HTTP ${res.status}`);
+      }
+      
+      const updatedGoal = await res.json();
+      set({ dailyGoal: updatedGoal });
+      return updatedGoal;
+    } catch (error) {
+      console.error("Error adding todo:", error);
+      set({ error: error.message });
+      throw error;
+    }
+  },
+
+  updateTodo: async (todoId, updateData) => {
+    set({ error: null });
+    try {
+      const res = await fetch(`/api/study/goal/todos/${todoId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: 'include',
+        body: JSON.stringify(updateData),
+      });
+      
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || `HTTP ${res.status}`);
+      }
+      
+      const updatedGoal = await res.json();
+      set({ dailyGoal: updatedGoal });
+      return updatedGoal;
+    } catch (error) {
+      console.error("Error updating todo:", error);
+      set({ error: error.message });
+      throw error;
+    }
+  },
+
+  deleteTodo: async (todoId) => {
+    set({ error: null });
+    try {
+      const res = await fetch(`/api/study/goal/todos/${todoId}`, {
+        method: "DELETE",
+        credentials: 'include',
+      });
+      
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || `HTTP ${res.status}`);
+      }
+      
+      const updatedGoal = await res.json();
+      set({ dailyGoal: updatedGoal });
+      return updatedGoal;
+    } catch (error) {
+      console.error("Error deleting todo:", error);
+      set({ error: error.message });
+      throw error;
+    }
+  },
+
   // Utility methods
   clearError: () => set({ error: null }),
   

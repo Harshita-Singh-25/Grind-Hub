@@ -158,7 +158,10 @@ export const getDailyGoal = async (req, res) => {
       goal = new DailyGoal({
         user: userId,
         target: 60, // Default 60 minutes
-        current: 0
+        current: 0,
+        todos: [],
+        completedTodos: 0,
+        totalTodos: 0
       });
       await goal.save();
     }
@@ -177,6 +180,12 @@ export const getDailyGoal = async (req, res) => {
 
     const current = todaySessions.reduce((total, session) => total + session.duration, 0);
     goal.current = current;
+
+    // Update todo statistics
+    goal.completedTodos = goal.todos.filter(todo => todo.completed).length;
+    goal.totalTodos = goal.todos.length;
+
+    await goal.save();
 
     res.status(200).json(goal);
   } catch (error) {
@@ -203,6 +212,120 @@ export const updateDailyGoal = async (req, res) => {
     res.status(200).json(goal);
   } catch (error) {
     console.log("Error in updateDailyGoal controller: ", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// Add new todo item
+export const addTodo = async (req, res) => {
+  try {
+    const { text, priority = 'medium', estimatedTime = 30 } = req.body;
+    const userId = req.user._id;
+
+    if (!text || text.trim().length === 0) {
+      return res.status(400).json({ error: "Todo text is required" });
+    }
+
+    if (text.length > 200) {
+      return res.status(400).json({ error: "Todo text must be less than 200 characters" });
+    }
+
+    const todoId = new Date().getTime().toString();
+    const newTodo = {
+      id: todoId,
+      text: text.trim(),
+      priority,
+      estimatedTime: Math.max(5, Math.min(480, estimatedTime)),
+      completed: false,
+      actualTime: 0,
+      createdAt: new Date()
+    };
+
+    const goal = await DailyGoal.findOneAndUpdate(
+      { user: userId },
+      { 
+        $push: { todos: newTodo },
+        $inc: { totalTodos: 1 }
+      },
+      { new: true, upsert: true }
+    );
+
+    res.status(201).json(goal);
+  } catch (error) {
+    console.log("Error in addTodo controller: ", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// Update todo item
+export const updateTodo = async (req, res) => {
+  try {
+    const { todoId } = req.params;
+    const { text, priority, estimatedTime, completed, actualTime } = req.body;
+    const userId = req.user._id;
+
+    const updateFields = {};
+    if (text !== undefined) updateFields['todos.$.text'] = text.trim();
+    if (priority !== undefined) updateFields['todos.$.priority'] = priority;
+    if (estimatedTime !== undefined) updateFields['todos.$.estimatedTime'] = Math.max(5, Math.min(480, estimatedTime));
+    if (actualTime !== undefined) updateFields['todos.$.actualTime'] = Math.max(0, actualTime);
+    
+    if (completed !== undefined) {
+      updateFields['todos.$.completed'] = completed;
+      if (completed) {
+        updateFields['todos.$.completedAt'] = new Date();
+      } else {
+        updateFields['todos.$.completedAt'] = null;
+      }
+    }
+
+    const goal = await DailyGoal.findOneAndUpdate(
+      { user: userId, 'todos.id': todoId },
+      { $set: updateFields },
+      { new: true }
+    );
+
+    if (!goal) {
+      return res.status(404).json({ error: "Todo not found" });
+    }
+
+    // Update statistics
+    goal.completedTodos = goal.todos.filter(todo => todo.completed).length;
+    await goal.save();
+
+    res.status(200).json(goal);
+  } catch (error) {
+    console.log("Error in updateTodo controller: ", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// Delete todo item
+export const deleteTodo = async (req, res) => {
+  try {
+    const { todoId } = req.params;
+    const userId = req.user._id;
+
+    const goal = await DailyGoal.findOneAndUpdate(
+      { user: userId },
+      { 
+        $pull: { todos: { id: todoId } },
+        $inc: { totalTodos: -1 }
+      },
+      { new: true }
+    );
+
+    if (!goal) {
+      return res.status(404).json({ error: "Goal not found" });
+    }
+
+    // Update statistics
+    goal.completedTodos = goal.todos.filter(todo => todo.completed).length;
+    await goal.save();
+
+    res.status(200).json(goal);
+  } catch (error) {
+    console.log("Error in deleteTodo controller: ", error.message);
     res.status(500).json({ error: "Internal server error" });
   }
 };
