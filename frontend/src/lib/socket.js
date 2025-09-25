@@ -21,6 +21,7 @@ export const initSocket = (userId) => {
   socket = io(URL, {
     query: { userId },
     withCredentials: true,
+    transports: ['websocket', 'polling'], // Add this line
     autoConnect: true,
     reconnection: true,
     reconnectionAttempts: 5,

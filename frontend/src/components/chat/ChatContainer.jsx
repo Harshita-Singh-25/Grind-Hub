@@ -6,7 +6,8 @@ import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
 import MessageSkeleton from "../skeletons/MessageSkeleton";
 import { useAuthStore } from "../../store/useAuthStore.js";
-//import { formatMessageTime } from "../lib/utils";
+import { formatMessageTime } from "../../lib/utils"; // Add this import
+
 
 const ChatContainer = () => {
   const {
@@ -26,7 +27,7 @@ const ChatContainer = () => {
     subscribeToMessages();
 
     return () => unsubscribeFromMessages();
-  }, [selectedUser._id, getMessages, subscribeToMessages, unsubscribeFromMessages]);
+  }, [selectedUser?._id, getMessages, subscribeToMessages, unsubscribeFromMessages]);
 
   useEffect(() => {
     if (messageEndRef.current && messages) {
@@ -44,6 +45,16 @@ const ChatContainer = () => {
     );
   }
 
+
+  // Add safety check for selectedUser
+  if (!selectedUser) {
+    return (
+      <div className="flex-1 flex flex-col overflow-auto">
+        <div className="p-4">No user selected</div>
+      </div>
+    );
+  }
+  
   return (
     <div className="flex-1 flex flex-col overflow-auto">
       <ChatHeader />
