@@ -85,25 +85,82 @@ export const logout = (req, res) => {
   }
 };
 
+
+
 export const updateProfile = async (req, res) => {
   try {
-    const { profilePic } = req.body;
+    const { profilePic, fullName, email } = req.body;
     const userId = req.user._id;
 
-    if (!profilePic) {
-      return res.status(400).json({ message: "Profile pic is required" });
+    // Validate input
+    if (!fullName || !email) {
+      return res.status(400).json({ message: "Full name and email are required" });
     }
 
-    const uploadResponse = await cloudinary.uploader.upload(profilePic);
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+
+    // Check if email is already taken by another user
+    if (email !== req.user.email) {
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({ message: "Email already in use" });
+      }
+    }
+
+    // Prepare update object
+    const updateData = {
+      fullName: fullName.trim(),
+      email: email.trim(),
+    };
+
+    // Handle profile picture upload if provided
+    if (profilePic) {
+      try {
+        // Delete old profile picture if it exists and is from cloudinary
+        const currentUser = await User.findById(userId);
+        if (currentUser.profilePic && currentUser.profilePic.includes('cloudinary')) {
+          const publicId = currentUser.profilePic.split('/').pop().split('.')[0];
+          await cloudinary.uploader.destroy(publicId);
+        }
+
+        // Upload new profile picture
+        const uploadResponse = await cloudinary.uploader.upload(profilePic, {
+          folder: "chat_app_profiles",
+          width: 400,
+          height: 400,
+          crop: "fill"
+        });
+        
+        updateData.profilePic = uploadResponse.secure_url;
+      } catch (uploadError) {
+        console.log("Error uploading to cloudinary:", uploadError);
+        return res.status(500).json({ message: "Error uploading image" });
+      }
+    }
+
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { profilePic: uploadResponse.secure_url },
+      updateData,
       { new: true }
-    );
+    ).select("-password");
 
-    res.status(200).json(updatedUser);
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      _id: updatedUser._id,
+      fullName: updatedUser.fullName,
+      email: updatedUser.email,
+      profilePic: updatedUser.profilePic,
+      createdAt: updatedUser.createdAt,
+    });
   } catch (error) {
-    console.log("error in update profile:", error);
+    console.log("Error in updateProfile controller:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

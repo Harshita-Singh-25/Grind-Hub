@@ -1,13 +1,28 @@
 import React from 'react';
-import { User, Mail, Calendar, Trophy, Target } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { User, Mail, Calendar, Trophy, Target, Edit } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 
 const ProfilePage = () => {
   const { authUser } = useAuthStore();
 
+  if (!authUser) {
+    return (
+      <div className="p-6 flex items-center justify-center min-h-96">
+        <span className="loading loading-spinner loading-lg text-primary"></span>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8">Profile</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">Profile</h1>
+        <Link to="/profile/edit" className="btn btn-primary gap-2">
+          <Edit size={16} />
+          Edit Profile
+        </Link>
+      </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Profile Info */}
@@ -16,7 +31,11 @@ const ProfilePage = () => {
             <div className="card-body p-6 text-center">
               <div className="avatar mb-4">
                 <div className="w-24 rounded-full">
-                  <img src={authUser?.profilePic || '/default-avatar.png'} alt="Profile" />
+                  <img 
+                    src={authUser?.profilePic || '/default-avatar.png'} 
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               </div>
               <h2 className="text-xl font-bold">{authUser?.fullName}</h2>
@@ -33,31 +52,60 @@ const ProfilePage = () => {
               <h3 className="text-lg font-bold mb-4">Account Information</h3>
               
               <div className="space-y-4">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 p-3 bg-base-200 rounded-lg">
                   <User size={20} className="text-primary" />
-                  <span>Full Name: {authUser?.fullName}</span>
+                  <div>
+                    <span className="text-sm text-base-content/70">Full Name</span>
+                    <p className="font-medium">{authUser?.fullName}</p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-3">
+                
+                <div className="flex items-center gap-3 p-3 bg-base-200 rounded-lg">
                   <Mail size={20} className="text-primary" />
-                  <span>Email: {authUser?.email}</span>
+                  <div>
+                    <span className="text-sm text-base-content/70">Email</span>
+                    <p className="font-medium">{authUser?.email}</p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-3">
+                
+                <div className="flex items-center gap-3 p-3 bg-base-200 rounded-lg">
                   <Calendar size={20} className="text-primary" />
-                  <span>Joined: {new Date(authUser?.createdAt).toLocaleDateString()}</span>
+                  <div>
+                    <span className="text-sm text-base-content/70">Member Since</span>
+                    <p className="font-medium">{new Date(authUser?.createdAt).toLocaleDateString()}</p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-3">
+                
+                <div className="flex items-center gap-3 p-3 bg-base-200 rounded-lg">
                   <Trophy size={20} className="text-primary" />
-                  <span>Current Streak: {authUser?.streak || 0} days</span>
+                  <div>
+                    <span className="text-sm text-base-content/70">Current Streak</span>
+                    <p className="font-medium">{authUser?.streak || 0} days</p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-3">
+                
+                <div className="flex items-center gap-3 p-3 bg-base-200 rounded-lg">
                   <Target size={20} className="text-primary" />
-                  <span>Problems Solved: {authUser?.totalProblems || 0}</span>
+                  <div>
+                    <span className="text-sm text-base-content/70">Problems Solved</span>
+                    <p className="font-medium">{authUser?.totalProblems || 0}</p>
+                  </div>
                 </div>
               </div>
 
               <div className="divider"></div>
               
-              <button className="btn btn-primary">Edit Profile</button>
+              {/* Quick Stats */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="stat bg-base-200 rounded-lg">
+                  <div className="stat-title">Account Status</div>
+                  <div className="stat-value text-lg text-success">Active</div>
+                </div>
+                <div className="stat bg-base-200 rounded-lg">
+                  <div className="stat-title">Profile Complete</div>
+                  <div className="stat-value text-lg text-primary">100%</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -67,107 +115,3 @@ const ProfilePage = () => {
 };
 
 export default ProfilePage;
-// import { useState } from "react";
-// import { useAuthStore } from "../store/useAuthStore";
-// import { Camera, Mail, User } from "lucide-react";
-
-// const ProfilePage = () => {
-//   const { authUser, isUpdatingProfile, updateProfile } = useAuthStore();
-//   const [selectedImg, setSelectedImg] = useState(null);
-
-//   const handleImageUpload = async (e) => {
-//     const file = e.target.files[0];
-//     if (!file) return;
-
-//     const reader = new FileReader();
-
-//     reader.readAsDataURL(file);
-
-//     reader.onload = async () => {
-//       const base64Image = reader.result;
-//       setSelectedImg(base64Image);
-//       await updateProfile({ profilePic: base64Image });
-//     };
-//   };
-
-//   return (
-//     <div className="h-screen pt-20">
-//       <div className="max-w-2xl mx-auto p-4 py-8">
-//         <div className="bg-base-300 rounded-xl p-6 space-y-8">
-//           <div className="text-center">
-//             <h1 className="text-2xl font-semibold ">Profile</h1>
-//             <p className="mt-2">Your profile information</p>
-//           </div>
-
-//           {/* avatar upload section */}
-
-//           <div className="flex flex-col items-center gap-4">
-//             <div className="relative">
-//               <img
-//                 src={selectedImg || authUser.profilePic || "/avatar.png"}
-//                 alt="Profile"
-//                 className="size-32 rounded-full object-cover border-4 "
-//               />
-//               <label
-//                 htmlFor="avatar-upload"
-//                 className={`
-//                   absolute bottom-0 right-0 
-//                   bg-base-content hover:scale-105
-//                   p-2 rounded-full cursor-pointer 
-//                   transition-all duration-200
-//                   ${isUpdatingProfile ? "animate-pulse pointer-events-none" : ""}
-//                 `}
-//               >
-//                 <Camera className="w-5 h-5 text-base-200" />
-//                 <input
-//                   type="file"
-//                   id="avatar-upload"
-//                   className="hidden"
-//                   accept="image/*"
-//                   onChange={handleImageUpload}
-//                   disabled={isUpdatingProfile}
-//                 />
-//               </label>
-//             </div>
-//             <p className="text-sm text-zinc-400">
-//               {isUpdatingProfile ? "Uploading..." : "Click the camera icon to update your photo"}
-//             </p>
-//           </div>
-
-//           <div className="space-y-6">
-//             <div className="space-y-1.5">
-//               <div className="text-sm text-zinc-400 flex items-center gap-2">
-//                 <User className="w-4 h-4" />
-//                 Full Name
-//               </div>
-//               <p className="px-4 py-2.5 bg-base-200 rounded-lg border">{authUser?.fullName}</p>
-//             </div>
-
-//             <div className="space-y-1.5">
-//               <div className="text-sm text-zinc-400 flex items-center gap-2">
-//                 <Mail className="w-4 h-4" />
-//                 Email Address
-//               </div>
-//               <p className="px-4 py-2.5 bg-base-200 rounded-lg border">{authUser?.email}</p>
-//             </div>
-//           </div>
-
-//           <div className="mt-6 bg-base-300 rounded-xl p-6">
-//             <h2 className="text-lg font-medium  mb-4">Account Information</h2>
-//             <div className="space-y-3 text-sm">
-//               <div className="flex items-center justify-between py-2 border-b border-zinc-700">
-//                 <span>Member Since</span>
-//                 <span>{authUser.createdAt?.split("T")[0]}</span>
-//               </div>
-//               <div className="flex items-center justify-between py-2">
-//                 <span>Account Status</span>
-//                 <span className="text-green-500">Active</span>
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-// export default ProfilePage;

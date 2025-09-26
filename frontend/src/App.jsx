@@ -1,6 +1,9 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import EditProfilePage from './pages/EditProfilePage'; // New import
+
+
 
 //import Sidebar from './components/common/Sidebar';
 import Sidebar from './components/common/SideBar';
@@ -56,6 +59,8 @@ function App() {
                 <Route path="/problems" element={<ProblemsPage />} />
                 <Route path="/study" element={<StudyPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/profile/edit" element={<EditProfilePage />} /> {/* New edit profile route */}
+
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </main>
