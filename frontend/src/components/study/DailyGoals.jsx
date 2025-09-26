@@ -40,8 +40,13 @@ const DailyGoals = () => {
     fetchDailyGoal();
   }, [fetchDailyGoal]);
 
-  const progress = dailyGoal ? Math.min((dailyGoal.current / dailyGoal.target) * 100, 100) : 0;
-  const todoProgress = dailyGoal ? Math.min((dailyGoal.completedTodos / dailyGoal.totalTodos) * 100, 100) : 0;
+  // Calculate progress based on completed todos instead of study time
+  const progress = dailyGoal && dailyGoal.totalTodos > 0 
+    ? Math.min((dailyGoal.completedTodos / dailyGoal.totalTodos) * 100, 100) 
+    : 0;
+  
+  // Keep the original study time progress for reference
+  const studyTimeProgress = dailyGoal ? Math.min((dailyGoal.current / dailyGoal.target) * 100, 100) : 0;
 
   const handleUpdateGoal = async () => {
     const target = Number(newGoal);
@@ -118,11 +123,12 @@ const DailyGoals = () => {
   };
 
   const getMessage = () => {
-    if (progress >= 100) return "Goal achieved! You're on fire! 🔥";
-    if (progress >= 75) return "Almost there! You've got this! 💪";
+    if (progress >= 100) return "All tasks completed! You're on fire! 🔥";
+    if (progress >= 75) return "Almost there! Just a few more tasks! 💪";
     if (progress >= 50) return "Halfway there! Keep pushing! 🚀";
     if (progress >= 25) return "Great start! Building momentum! ⚡";
-    return "Every minute counts towards your goals! ✨";
+    if (dailyGoal.totalTodos === 0) return "Add your first task to get started! ✨";
+    return "Every task completed brings you closer to your goals! ✨";
   };
 
   if (!dailyGoal) {
@@ -204,7 +210,7 @@ const DailyGoals = () => {
           <div className="flex justify-between text-sm mb-2">
             <span>Today's Progress</span>
             <span className="font-semibold">
-              {dailyGoal.current}min / {dailyGoal.target}min
+              {dailyGoal.completedTodos} / {dailyGoal.totalTodos} tasks completed
             </span>
           </div>
           <div className="w-full bg-base-300 rounded-full h-3">
@@ -219,6 +225,22 @@ const DailyGoals = () => {
             }`}>
               {Math.round(progress)}% Complete
             </span>
+          </div>
+          
+          {/* Study Time Progress (Secondary) */}
+          <div className="mt-4">
+            <div className="flex justify-between text-xs mb-1">
+              <span>Study Time</span>
+              <span className="text-base-content/70">
+                {dailyGoal.current}min / {dailyGoal.target}min
+              </span>
+            </div>
+            <div className="w-full bg-base-300 rounded-full h-2">
+              <div 
+                className="bg-gradient-to-r from-accent to-info rounded-full h-2 transition-all duration-500 ease-out"
+                style={{ width: `${studyTimeProgress}%` }}
+              ></div>
+            </div>
           </div>
         </div>
 
@@ -361,17 +383,17 @@ const DailyGoals = () => {
         <div className="grid grid-cols-2 gap-4">
           <div className="text-center p-3 bg-base-200 rounded-lg">
             <div className="text-lg font-bold text-secondary flex items-center justify-center gap-1">
-              <TrendingUp size={16} />
-              {studyStats?.streak || 0}
+              <CheckCircle2 size={16} />
+              {dailyGoal.completedTodos}
             </div>
-            <div className="text-xs text-base-content/70">Day Streak</div>
+            <div className="text-xs text-base-content/70">Tasks Done</div>
           </div>
           <div className="text-center p-3 bg-base-200 rounded-lg">
             <div className="text-lg font-bold text-accent flex items-center justify-center gap-1">
               <Target size={16} />
-              {studyStats?.totalProblems || 0}
+              {dailyGoal.totalTodos}
             </div>
-            <div className="text-xs text-base-content/70">Problems Solved</div>
+            <div className="text-xs text-base-content/70">Total Tasks</div>
           </div>
         </div>
       </div>
