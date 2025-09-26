@@ -24,14 +24,14 @@ const StudyPage = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Timer Section */}
+        {/* Main Goals Section */}
         <div className="lg:col-span-2">
-          <StudyTimer />
+          <DailyGoals />
         </div>
         
-        {/* Goals Sidebar */}
+        {/* Timer Sidebar */}
         <div className="space-y-6">
-          <DailyGoals />
+          <StudyTimer />
         </div>
       </div>
 
