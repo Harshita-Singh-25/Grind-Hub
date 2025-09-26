@@ -176,6 +176,34 @@ const useAuthStore = create((set, get) => ({
     } else {
       console.warn('Socket not connected, cannot refresh online users');
     }
+  },
+
+  updateProfile: async (profileData) => {
+    set({ isUpdatingProfile: true });
+    try {
+      const res = await fetch("/api/auth/update-profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: 'include',
+        body: JSON.stringify(profileData),
+      });
+      
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to update profile");
+      }
+      
+      const updatedUser = await res.json();
+      set({ authUser: updatedUser });
+      return updatedUser;
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      throw error;
+    } finally {
+      set({ isUpdatingProfile: false });
+    }
   }
 }));
 
