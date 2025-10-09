@@ -5,8 +5,8 @@ import EditProfilePage from './pages/EditProfilePage'; // New import
 
 
 
-//import Sidebar from './components/common/Sidebar';
-import Sidebar from './components/common/SideBar';
+import Sidebar from './components/common/Sidebar';
+//import Sidebar from './components/common/SideBar';
 import Navbar from './components/common/Navbar';
 import DashboardPage from './pages/DashBoardPage';
 import RoomsPage from './pages/RoomsPage';
