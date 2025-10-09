@@ -20,11 +20,18 @@ dotenv.config();
 const PORT = process.env.PORT || 5001;
 const __dirname = path.resolve();
 
+
+const allowedOrigins = [
+    "http://localhost:5173",
+    "https://grind-hub-frontend.vercel.app",
+    "https://grind-hub-frontend.onrender.com"
+];
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: allowedOrigins,
     credentials: true,
   })
 );
