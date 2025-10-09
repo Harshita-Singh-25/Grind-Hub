@@ -42,7 +42,7 @@ app.use("/api/rooms", roomRoutes); // Add this
 app.use("/api/problems", problemRoutes); // Add this
 app.use("/api/study", (await import("./routes/study.route.js")).default);
 
-
+/*
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
@@ -50,6 +50,7 @@ if (process.env.NODE_ENV === "production") {
     res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
   });
 }
+*/
 
 server.listen(PORT, () => {
   console.log("server is running on PORT:" + PORT);
