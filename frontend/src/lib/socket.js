@@ -1,7 +1,16 @@
 import { io } from 'socket.io-client';
 import { useAuthStore } from '../store/useAuthStore';
 
-const URL = import.meta.env.VITE_SOCKET_URL; // Use the SOCKET URL from environment variables
+
+const isDevelopment = import.meta.env.MODE === "development";
+
+//const URL = import.meta.env.VITE_SOCKET_URL; // Use the SOCKET URL from environment variables
+//SINCE IT IS NOT WORKING HARDCODING THE BACJEND URL 
+const URL = isDevelopment
+  ? "http://localhost:5001"
+  : "https://grind-hub-backend.onrender.com";
+
+
 let socket;
 
 // Initialize the socket connection with the user ID
