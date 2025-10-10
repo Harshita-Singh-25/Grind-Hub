@@ -1,6 +1,9 @@
 import { create } from "zustand";
 import { axiosInstance } from '../lib/axios';
 import { initSocket, disconnectSocket } from '../lib/socket';
+import { API_BASE_URL } from '../lib/config'; // ✅ Import from config
+
+
 
 const useAuthStore = create((set, get) => ({
   authUser: null,
@@ -13,7 +16,7 @@ const useAuthStore = create((set, get) => ({
 
   checkAuth: async () => {
     try {
-      const res = await fetch("/api/auth/check", {
+      const res = await fetch(`${API_BASE_URL}/auth/check`, {
         credentials: 'include'
       });
       
@@ -73,7 +76,7 @@ const useAuthStore = create((set, get) => ({
   signup: async (data) => {
     set({ isSigningUp: true });
     try {
-      const res = await fetch("/api/auth/signup", {
+       const res = await fetch(`${API_BASE_URL}/auth/check`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -110,7 +113,7 @@ const useAuthStore = create((set, get) => ({
   login: async (data) => {
     set({ isLoggingIn: true });
     try {
-      const res = await fetch("/api/auth/login", {
+      const res = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -146,7 +149,7 @@ const useAuthStore = create((set, get) => ({
 
   logout: async () => {
     try {
-      await fetch("/api/auth/logout", {
+      await fetch(`${API_BASE_URL}/auth/logout`, {
         method: "POST",
         credentials: 'include',
       });
@@ -181,7 +184,7 @@ const useAuthStore = create((set, get) => ({
   updateProfile: async (profileData) => {
     set({ isUpdatingProfile: true });
     try {
-      const res = await fetch("/api/auth/update-profile", {
+      const res = await fetch(`${API_BASE_URL}/auth/update-profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
