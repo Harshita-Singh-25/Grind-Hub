@@ -1,4 +1,7 @@
 import { create } from "zustand";
+import { API_BASE_URL } from '../lib/config'; // ✅ ADD THIS
+
+
 
 const useStudyStore = create((set, get) => ({
   studyStats: null,
@@ -12,7 +15,7 @@ const useStudyStore = create((set, get) => ({
   fetchStudyStats: async () => {
     set({ isLoading: true, error: null });
     try {
-      const res = await fetch("/api/study/stats", {
+      const res = await fetch(`${API_BASE_URL}/study/stats`, {
         credentials: 'include'
       });
       
@@ -32,7 +35,7 @@ const useStudyStore = create((set, get) => ({
   startStudySession: async (sessionData) => {
     set({ error: null });
     try {
-      const res = await fetch("/api/study/session/start", {
+      const res = await fetch(`${API_BASE_URL}/study/session/start`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: 'include',
@@ -57,7 +60,7 @@ const useStudyStore = create((set, get) => ({
   endStudySession: async (sessionId, sessionData) => {
     set({ error: null });
     try {
-      const res = await fetch("/api/study/session/end", {
+      const res = await fetch(`${API_BASE_URL}/study/session/end`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: 'include',
@@ -89,7 +92,7 @@ const useStudyStore = create((set, get) => ({
   fetchStudyHistory: async (page = 1, limit = 10) => {
     set({ isLoading: true, error: null });
     try {
-      const res = await fetch(`/api/study/history?page=${page}&limit=${limit}`, {
+      const res = await fetch(`${API_BASE_URL}/study/history?page=${page}&limit=${limit}`, {
         credentials: 'include'
       });
       
@@ -113,7 +116,7 @@ const useStudyStore = create((set, get) => ({
   fetchDailyGoal: async () => {
     set({ error: null });
     try {
-      const res = await fetch("/api/study/goal", {
+      const res = await fetch(`${API_BASE_URL}/study/goal`, {
         credentials: 'include'
       });
       
@@ -133,7 +136,7 @@ const useStudyStore = create((set, get) => ({
   updateDailyGoal: async (target) => {
     set({ error: null });
     try {
-      const res = await fetch("/api/study/goal", {
+      const res = await fetch(`${API_BASE_URL}/study/goal`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: 'include',
@@ -159,7 +162,7 @@ const useStudyStore = create((set, get) => ({
   addTodo: async (todoData) => {
     set({ error: null });
     try {
-      const res = await fetch("/api/study/goal/todos", {
+      const res = await fetch(`${API_BASE_URL}/study/goal/todos`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: 'include',
@@ -184,7 +187,7 @@ const useStudyStore = create((set, get) => ({
   updateTodo: async (todoId, updateData) => {
     set({ error: null });
     try {
-      const res = await fetch(`/api/study/goal/todos/${todoId}`, {
+      const res = await fetch(`${API_BASE_URL}/study/goal/todos/${todoId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: 'include',
@@ -209,7 +212,7 @@ const useStudyStore = create((set, get) => ({
   deleteTodo: async (todoId) => {
     set({ error: null });
     try {
-      const res = await fetch(`/api/study/goal/todos/${todoId}`, {
+      const res = await fetch(`${API_BASE_URL}/study/goal/todos/${todoId}`, {
         method: "DELETE",
         credentials: 'include',
       });

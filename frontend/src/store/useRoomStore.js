@@ -2,6 +2,8 @@
 import { create } from 'zustand';
 import { toast } from 'react-hot-toast';
 import { getSocket } from '../lib/socket';
+import { API_BASE_URL } from '../lib/config'; // ✅ ADD THIS
+
 
 export const useRoomStore = create((set, get) => ({
   // State
@@ -24,7 +26,7 @@ export const useRoomStore = create((set, get) => ({
       if (filters.category) queryParams.append('category', filters.category);
       if (filters.difficulty) queryParams.append('difficulty', filters.difficulty);
       
-      const res = await fetch(`/api/rooms?${queryParams}`, {
+      const res = await fetch(`${API_BASE_URL}/rooms?${queryParams}`, {
         credentials: 'include',
       });
       
@@ -46,7 +48,7 @@ export const useRoomStore = create((set, get) => ({
   createRoom: async (roomData) => {
     set({ isCreatingRoom: true });
     try {
-      const res = await fetch('/api/rooms/create', {
+      const res = await fetch(`${API_BASE_URL}/rooms/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -82,7 +84,7 @@ export const useRoomStore = create((set, get) => ({
   joinRoom: async (roomId) => {
     set({ isJoiningRoom: true });
     try {
-      const res = await fetch(`/api/rooms/join/${roomId}`, {
+      const res = await fetch(`${API_BASE_URL}/rooms/join/${roomId}`, {
         method: 'POST',
         credentials: 'include',
       });
@@ -120,7 +122,7 @@ export const useRoomStore = create((set, get) => ({
   // Leave a room
   leaveRoom: async (roomId) => {
     try {
-      const res = await fetch(`/api/rooms/leave/${roomId}`, {
+      const res = await fetch(`${API_BASE_URL}/rooms/leave/${roomId}`, {
         method: 'POST',
         credentials: 'include',
       });
@@ -157,7 +159,7 @@ export const useRoomStore = create((set, get) => ({
   // Fetch messages for a specific room
   fetchRoomMessages: async (roomId) => {
     try {
-      const res = await fetch(`/api/rooms/${roomId}/messages`, {
+      const res = await fetch(`${API_BASE_URL}/rooms/${roomId}/messages`, {
         credentials: 'include',
       });
 
@@ -205,7 +207,7 @@ export const useRoomStore = create((set, get) => ({
   // Update room (for moderators/creators)
   updateRoom: async (roomId, updateData) => {
     try {
-      const res = await fetch(`/api/rooms/${roomId}`, {
+      const res = await fetch(`${API_BASE_URL}/rooms/${roomId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -241,7 +243,7 @@ export const useRoomStore = create((set, get) => ({
   // Delete room (for creators only)
   deleteRoom: async (roomId) => {
     try {
-      const res = await fetch(`/api/rooms/${roomId}`, {
+      const res = await fetch(`${API_BASE_URL}/rooms/${roomId}`, {
         method: 'DELETE',
         credentials: 'include',
       });
