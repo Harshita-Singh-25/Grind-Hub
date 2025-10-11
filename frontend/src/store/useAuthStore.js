@@ -76,7 +76,7 @@ const useAuthStore = create((set, get) => ({
   signup: async (data) => {
     set({ isSigningUp: true });
     try {
-       const res = await fetch(`${API_BASE_URL}/auth/check`, {
+       const res = await fetch(`${API_BASE_URL}/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
