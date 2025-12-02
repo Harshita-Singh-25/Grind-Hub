@@ -1,13 +1,9 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import EditProfilePage from './pages/EditProfilePage'; // New import
 
-
-
+import EditProfilePage from './pages/EditProfilePage';
 import Sidebar from './components/common/Sidebar';
-//import Sidebar from './components/common/SideBar';
-//import Navbar from './components/common/Navbar';
 import Navbar from './components/common/NavBar';
 import DashboardPage from './pages/DashBoardPage';
 import RoomsPage from './pages/RoomsPage';
@@ -16,9 +12,8 @@ import StudyPage from './pages/StudyPage';
 import ProfilePage from './pages/ProfilePage';
 import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
-
-import ChatPage from './pages/ChatPage'; // New import
-
+import ChatPage from './pages/ChatPage';
+import LandingPage from './pages/LandingPage'; // Add this import
 
 import { useAuthStore } from './store/useAuthStore';
 import { useEffect } from 'react';
@@ -28,11 +23,9 @@ function App() {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
 
   useEffect(() => {
-    // Only check auth if we're not in a development environment without backend
     checkAuth();
   }, [checkAuth]);
 
-  // Show loading spinner while checking auth
   if (isCheckingAuth) {
     return (
       <div className="flex items-center justify-center h-screen bg-base-300">
@@ -55,13 +48,11 @@ function App() {
               <Routes>
                 <Route path="/" element={<DashboardPage />} />
                 <Route path="/rooms" element={<RoomsPage />} />
-                <Route path="/chat" element={<ChatPage />} /> {/* New chat route */}
-
+                <Route path="/chat" element={<ChatPage />} />
                 <Route path="/problems" element={<ProblemsPage />} />
                 <Route path="/study" element={<StudyPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/profile/edit" element={<EditProfilePage />} /> {/* New edit profile route */}
-
+                <Route path="/profile/edit" element={<EditProfilePage />} />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </main>
@@ -69,9 +60,10 @@ function App() {
         </div>
       ) : (
         <Routes>
+          <Route path="/" element={<LandingPage />} /> {/* Change this */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignUpPage />} />
-          <Route path="*" element={<Navigate to="/login" />} />
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       )}
       <Toaster position="top-right" />
